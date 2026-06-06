@@ -1,0 +1,41 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <style name="Base.Theme.LocalisationSmartphone" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Couleurs principales -->
+        <item name="colorPrimary">@color/colorAccent</item>
+        <item name="colorOnPrimary">@color/colorBackground</item>
+        <item name="colorSecondary">@color/colorAccentDim</item>
+        <item name="colorOnSecondary">@color/colorBackground</item>
+        <!-- Fond sombre -->
+        <item name="android:windowBackground">@color/colorBackground</item>
+        <item name="android:statusBarColor">@color/colorBackground</item>
+        <item name="android:navigationBarColor">@color/colorBackground</item>
+        <item name="android:windowLightStatusBar" tools:targetApi="23">false</item>
+        <!-- Textes -->
+        <item name="android:textColorPrimary">@color/colorTextPrimary</item>
+        <item name="android:textColorSecondary">@color/colorTextSecondary</item>
+    </style>
+
+    <style name="Theme.LocalisationSmartphone" parent="Base.Theme.LocalisationSmartphone" />
+
+    <!-- Style des cartes du dashboard -->
+    <style name="DashboardCard">
+        <item name="android:background">@drawable/bg_card</item>
+        <item name="android:padding">16dp</item>
+    </style>
+
+    <!-- Label de section (uppercase, bleu électrique) -->
+    <style name="SectionLabel">
+        <item name="android:textColor">@color/colorAccent</item>
+        <item name="android:textSize">11sp</item>
+        <item name="android:letterSpacing">0.12</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:fontFamily">monospace</item>
+    </style>
+
+    <!-- Valeur métrique (monospace, blanc) -->
+    <style name="MetricValue">
+        <item name="android:textColor">@color/colorTextPrimary</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:fontFamily">monospace</item>
+    </style>
+</resources>

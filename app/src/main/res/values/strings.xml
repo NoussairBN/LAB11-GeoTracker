@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">GeoTracker</string>
+    <string name="gps_waiting">En attente du signal GPS…</string>
+    <string name="btn_send">Envoyer la position</string>
+    <string name="label_latitude">LATITUDE</string>
+    <string name="label_longitude">LONGITUDE</string>
+    <string name="label_altitude">ALTITUDE</string>
+    <string name="label_precision">PRÉCISION</string>
+    <string name="label_provider">FOURNISSEUR</string>
+    <string name="label_date">HORODATAGE</string>
+    <string name="label_imei">IDENTIFIANT</string>
+    <string name="label_server">SERVEUR</string>
+</resources>
