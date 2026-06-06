@@ -9,8 +9,8 @@
 ![SDK](https://img.shields.io/badge/Min%20SDK-API%2024-3DDC84?style=for-the-badge&logo=android)
 ![Status](https://img.shields.io/badge/Status-Fonctionnel%20✅-00E5FF?style=for-the-badge)
 
-**Application Android de géolocalisation connectée à un backend distant**  
-*TP 11 — Localisation d'un smartphone | Bouanani Noussair*
+**Application Android de géolocalisation connectée à un backend distant**
+*TP 11 — Localisation d'un Smartphone | Bouanani Noussair*
 
 </div>
 
@@ -26,6 +26,8 @@
 - [Installation Android](#-installation-android)
 - [Structure du projet](#-structure-du-projet)
 - [API Reference](#-api-reference)
+- [Tests réalisés](#-tests-réalisés)
+- [Démonstration](#-démonstration)
 - [Concepts techniques](#-concepts-techniques)
 - [Questions de compréhension](#-questions-de-compréhension)
 - [Auteur](#-auteur)
@@ -55,55 +57,33 @@
 | 1 | **Détection GPS automatique** | Signal détecté → coordonnées affichées en temps réel |
 | 2 | **Envoi automatique** | Chaque nouvelle position envoyée automatiquement au serveur |
 | 3 | **Envoi manuel** | Bouton pour forcer l'envoi immédiat |
-| 4 | **Statut temps réel** | Point vert/orange/rouge selon l'état du GPS |
+| 4 | **Statut temps réel** | Point vert / orange / rouge selon l'état du GPS |
 | 5 | **Confirmation serveur** | Réponse JSON du PHP affichée dans l'interface |
-
-### Scénario complet (visible dans la vidéo)
-1. Lancement de l'application → thème System Dashboard sombre
-2. Signal GPS détecté → point vert, coordonnées affichées
-3. Envoi automatique → confirmation `✅ Position enregistrée.`
-4. Vérification phpMyAdmin → nouvelle ligne dans la table `position`
 
 ---
 
 ## Architecture du projet
 
 ```
-LAB20-GeoTracker/
+LAB11-GeoTracker/
 │
-├── 📱 app/                              ← Application Android (Java)
+├── app/                              ← Application Android (Java)
 │   └── src/main/
-│       ├── AndroidManifest.xml          ← Permissions GPS + INTERNET + usesCleartextTraffic
-│       ├── java/com/example/localisationsmartphone/
-│       │   └── MainActivity.java        ← GPS + Volley POST + Dashboard UI
-│       └── res/
-│           ├── layout/
-│           │   └── activity_main.xml    ← Dashboard complet (5 cartes)
-│           ├── drawable/
-│           │   ├── bg_card.xml          ← Fond de carte sombre
-│           │   ├── bg_button.xml        ← Bouton bleu électrique
-│           │   ├── bg_chip.xml          ← Badge provider GPS
-│           │   ├── bg_dot_active.xml    ← Point vert (signal actif)
-│           │   ├── bg_dot_waiting.xml   ← Point orange (en attente)
-│           │   └── bg_dot_error.xml     ← Point rouge (erreur)
-│           └── values/
-│               ├── colors.xml          ← Palette #121212 + #00E5FF
-│               ├── strings.xml         ← Chaînes françaises
-│               └── themes.xml          ← Thème System Dashboard
+│       ├── AndroidManifest.xml
+│       ├── java/.../MainActivity.java
+│       └── res/  (layout, drawable, values)
 │
-├── 🖥️ php-server/                      ← Backend PHP (XAMPP)
-│   └── localisation/
-│       ├── createPosition.php          ← POST — Endpoint principal
-│       ├── init_db.sql                 ← Création BDD + table + données test
-│       ├── classe/Position.php         ← Modèle métier
-│       ├── connexion/Connexion.php     ← Connexion PDO MySQL
-│       ├── dao/IDao.php                ← Interface DAO
-│       └── service/PositionService.php ← Logique CRUD
+├── php-server/localisation/         ← Backend PHP (XAMPP)
+│   ├── createPosition.php
+│   ├── init_db.sql
+│   ├── classe/Position.php
+│   ├── connexion/Connexion.php
+│   ├── dao/IDao.php
+│   └── service/PositionService.php
 │
-└── 📁 docs/
-    └── media/
-        ├── demo_screenshot.png         ← Capture de l'application
-        └── demo_video.mp4              ← Vidéo de démonstration
+└── docs/media/
+    ├── demo_screenshot.png
+    └── demo_video.mp4
 ```
 
 ---
@@ -127,102 +107,47 @@ LAB20-GeoTracker/
 | Technologie | Rôle |
 |---|---|
 | PHP 7.4+ | Langage serveur |
-| PDO | Accès base de données sécurisé (requêtes préparées) |
+| PDO | Accès base de données sécurisé |
 | MySQL / MariaDB | Stockage des positions GPS |
 | JSON | Format d'échange de données |
 | XAMPP | Serveur local (Apache + MySQL) |
 
 ---
 
-## 🖥️ Installation Backend
-
-### Prérequis
-- XAMPP installé et démarré (Apache + MySQL)
-
-### Étapes
+## Installation Backend
 
 **1. Déployer le backend**
 ```
-Copier le dossier php-server/localisation/
-→ vers C:\xampp\htdocs\localisation\
+php-server/localisation/  →  C:\xampp\htdocs\localisation\
 ```
 
 **2. Initialiser la base de données**
-
-Dans **phpMyAdmin → SQL**, exécuter :
-```sql
--- Fichier : php-server/localisation/init_db.sql
-CREATE DATABASE IF NOT EXISTS localisation
-    CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
-USE localisation;
-
-CREATE TABLE IF NOT EXISTS position (
-    id            INT AUTO_INCREMENT PRIMARY KEY,
-    latitude      DOUBLE      NOT NULL,
-    longitude     DOUBLE      NOT NULL,
-    date_position DATETIME    NOT NULL,
-    imei          VARCHAR(50) NOT NULL,
-    created_at    TIMESTAMP   DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+```
+phpMyAdmin → SQL → importer init_db.sql
 ```
 
-**3. Tester l'endpoint**
+**3. Vérifier l'endpoint**
 ```
-Navigateur : http://192.168.100.246/localisation/createPosition.php
-→ Résultat attendu : {"status":"error","message":"Méthode non autorisée."}
-(Normal — le GET est refusé, le PHP fonctionne)
-```
-
-**4. Tester avec Postman**
-```
-POST http://192.168.100.246/localisation/createPosition.php
-Body → x-www-form-urlencoded :
-  latitude      = 48.8566
-  longitude     = 2.3522
-  date_position = 2025-09-01 08:00:00
-  imei          = TEST-001
-→ Résultat attendu : {"status":"success","message":"Position enregistrée."}
+GET http://192.168.100.246/localisation/createPosition.php
+→ {"status":"error","message":"Méthode non autorisée."}  ✅ Normal
 ```
 
 ---
 
 ## Installation Android
 
-### Prérequis
-- Android Studio (Flamingo ou supérieur)
-- SDK Android API 24+
-- Appareil ou émulateur Android
-
-### Étapes
-
 **1. Ouvrir le projet**
 ```
-File → Open → LAB20-GeoTracker/
+Android Studio → File → Open → LAB11-GeoTracker/
 ```
 
-**2. Configurer l'IP du serveur**
-
-Dans [`MainActivity.java`](app/src/main/java/com/example/localisationsmartphone/MainActivity.java) ligne 47 :
-```java
-// Appareil physique sur le même WiFi :
-private static final String SERVER_URL =
-    "http://192.168.100.246/localisation/createPosition.php";
-
-// Émulateur Android Studio :
-// Remplacer par : "http://10.0.2.2/localisation/createPosition.php"
+**2. Configurer l'IP dans `MainActivity.java` ligne 47**
+```
+Appareil physique  → http://192.168.100.246/localisation/createPosition.php
+Émulateur          → http://10.0.2.2/localisation/createPosition.php
 ```
 
-**3. Gradle Sync**
-```
-File → Sync Project with Gradle Files
-```
-
-**4. Lancer**
-```
-Run ▶ sur l'appareil cible (téléphone ou émulateur)
-Accepter les permissions GPS demandées au démarrage
-```
+**3. Run ▶** sur l'appareil cible — accepter les permissions GPS.
 
 ---
 
@@ -230,164 +155,132 @@ Accepter les permissions GPS demandées au démarrage
 
 ### `POST /localisation/createPosition.php`
 
-```json
-// Requête (x-www-form-urlencoded)
-latitude      = 37.421998
-longitude     = -122.084000
-date_position = 2026-06-06 13:23:14
-imei          = 352099001761481
+**Paramètres attendus (x-www-form-urlencoded)**
 
-// Réponse succès (HTTP 201)
+| Paramètre | Type | Exemple |
+|---|---|---|
+| `latitude` | float | `48.8566` |
+| `longitude` | float | `2.3522` |
+| `date_position` | datetime | `2025-09-01 08:00:00` |
+| `imei` | string | `352099001761481` |
+
+**Réponses possibles**
+
+| Code | Signification |
+|---|---|
+| `201 Created` | Position enregistrée avec succès |
+| `400 Bad Request` | Paramètres manquants ou invalides |
+| `405 Method Not Allowed` | Méthode GET utilisée au lieu de POST |
+| `500 Internal Server Error` | Erreur d'insertion MySQL |
+
+### Structure de la table `position`
+
+| Colonne | Type | Description |
+|---|---|---|
+| `id` | INT AUTO_INCREMENT | Clé primaire |
+| `latitude` | DOUBLE | Latitude GPS |
+| `longitude` | DOUBLE | Longitude GPS |
+| `date_position` | DATETIME | Horodatage de la mesure |
+| `imei` | VARCHAR(50) | Identifiant unique du terminal |
+| `created_at` | TIMESTAMP | Date d'insertion en BDD |
+
+---
+
+## Tests réalisés
+
+### ① Vérification de l'endpoint (navigateur)
+
+Accès direct en GET à l'URL du script PHP → retourne `Méthode non autorisée`.
+Cela confirme que le fichier PHP est bien déployé et accessible sur le réseau.
+
+### ② Test Postman — envoi HTTP POST
+
+Simulation d'une requête Android via Postman avec les 4 paramètres GPS.
+
+**Requête envoyée**
+```
+POST http://192.168.100.246/localisation/createPosition.php
+Content-Type: x-www-form-urlencoded
+
+latitude      = 48.8566
+longitude     = 2.3522
+date_position = 2025-09-01 08:00:00
+imei          = TEST-001
+```
+
+**Réponse reçue — HTTP 201**
+```json
 {
   "status": "success",
   "message": "Position enregistrée.",
   "data": {
-    "latitude": 37.421998,
-    "longitude": -122.084,
-    "date_position": "2026-06-06 13:23:14",
-    "imei": "352099001761481"
+    "latitude": 48.8566,
+    "longitude": 2.3522,
+    "date_position": "2025-09-01 08:00:00",
+    "imei": "TEST-001"
   }
 }
-
-// Réponse erreur paramètres (HTTP 400)
-{ "status": "error", "message": "Paramètres invalides." }
-
-// Réponse méthode non autorisée (HTTP 405)
-{ "status": "error", "message": "Méthode non autorisée." }
 ```
 
-### Structure de la table `position`
+### ③ Vérification phpMyAdmin
 
-```sql
-CREATE TABLE position (
-    id            INT AUTO_INCREMENT PRIMARY KEY,
-    latitude      DOUBLE      NOT NULL,   -- Ex: 37.421998
-    longitude     DOUBLE      NOT NULL,   -- Ex: -122.084000
-    date_position DATETIME    NOT NULL,   -- Ex: 2026-06-06 13:23:14
-    imei          VARCHAR(50) NOT NULL,   -- Identifiant unique du terminal
-    created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-```
+Après le test Postman, vérification directe en SQL que la ligne est bien insérée dans la table `position` avec les bonnes valeurs.
+
+### ④ Test depuis l'application Android (émulateur)
+
+L'émulateur **MobSF AVD API 30** a été utilisé avec une position GPS simulée via les **Extended Controls** d'Android Studio (coordonnées de Mountain View, CA — position par défaut de l'émulateur Google).
+
+**Résultats observés :**
+
+| Champ | Valeur |
+|---|---|
+| Latitude | `37.421998 °` |
+| Longitude | `-122.084000 °` |
+| Altitude | `5.0 m` |
+| Précision | `± 5 m` |
+| Provider | `GPS` |
+| Horodatage | `2026-06-06 13:23:14` |
+| Statut serveur | `✅ Position enregistrée.` |
+
+La ligne a bien été insérée en base de données avec `imei = unknown` (comportement normal sur émulateur).
+
+---
+
+## Démonstration
+
+### Capture d'écran — Application en fonctionnement
+
+![GeoTracker Screenshot](docs/media/demo_screenshot.png)
+
+---
+
+### Vidéo de démonstration
+
+<video src="docs/media/demo_video.mp4" controls width="100%">
+  Votre navigateur ne supporte pas la lecture vidéo.
+</video>
 
 ---
 
 ## Concepts techniques
 
-### 1. LocationManager — Accès au GPS Android
+### LocationManager et providers GPS
+Android expose le matériel GPS via un service système. L'application choisit entre **GPS_PROVIDER** (précision maximale, consommateur de batterie) et **NETWORK_PROVIDER** (plus rapide, moins précis). La fréquence de mise à jour est contrôlée par un intervalle de temps minimum et un déplacement minimum en mètres.
 
-Android expose le GPS via le service système `LocationManager`.
-La méthode `requestLocationUpdates()` configure l'écoute des positions :
+### Gestion des permissions runtime
+Depuis Android 6.0 (API 23), les permissions sensibles comme `ACCESS_FINE_LOCATION` doivent être demandées à l'exécution. L'API moderne `ActivityResultLauncher` remplace l'ancienne méthode `onRequestPermissionsResult()` pour gérer la réponse de l'utilisateur.
 
-```java
-LocationManager locationManager =
-    (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+### Volley — communication asynchrone
+Volley est une bibliothèque Android qui gère les requêtes réseau en arrière-plan et retourne les résultats sur le thread principal. Android interdit les appels réseau sur le thread UI — Volley gère cette contrainte automatiquement via une file d'attente interne.
 
-locationManager.requestLocationUpdates(
-    LocationManager.GPS_PROVIDER, // Provider : antenne GPS intégrée
-    30_000L,   // minTime : 30 secondes minimum entre deux updates
-    50f,       // minDistance : 50 mètres de déplacement minimum
-    locationListener
-);
-```
+### Architecture PHP en couches
+Le backend suit une architecture en couches : **classe métier** (Position), **interface DAO** (IDao), **service** (PositionService), **connexion** (Connexion PDO) et **script d'entrée** (createPosition.php). Cette séparation facilite la maintenance et les tests.
 
-> **GPS_PROVIDER vs NETWORK_PROVIDER** :  
-> GPS = précision maximale (±5m) mais plus lent / consommateur de batterie.  
-> NETWORK = utilise le WiFi/4G pour une localisation rapide mais moins précise.
+### Sécurité — requêtes préparées PDO
+Les paramètres reçus par POST ne sont jamais concaténés directement dans les requêtes SQL. PDO utilise des paramètres liés (`:latitude`, `:longitude`...) qui empêchent les injections SQL.
 
-### 2. LocationListener — Réception des positions
-
-```java
-private final LocationListener locationListener = new LocationListener() {
-    @Override
-    public void onLocationChanged(@NonNull Location location) {
-        // Appelé à chaque nouvelle position détectée
-        double lat = location.getLatitude();
-        double lon = location.getLongitude();
-        float  acc = location.getAccuracy();   // Précision en mètres
-        double alt = location.getAltitude();   // Altitude en mètres
-
-        // Envoi automatique au serveur
-        sendPositionToServer();
-    }
-};
-```
-
-### 3. Permissions GPS — API moderne (ActivityResult)
-
-```java
-// Déclaration du launcher (avant onCreate)
-private final ActivityResultLauncher<String[]> permissionLauncher =
-    registerForActivityResult(
-        new ActivityResultContracts.RequestMultiplePermissions(),
-        grants -> {
-            boolean ok = Boolean.TRUE.equals(
-                grants.get(Manifest.permission.ACCESS_FINE_LOCATION));
-            if (ok) startLocationUpdates();
-        }
-    );
-
-// Demande de permissions
-permissionLauncher.launch(new String[]{
-    Manifest.permission.ACCESS_FINE_LOCATION,
-    Manifest.permission.ACCESS_COARSE_LOCATION,
-    Manifest.permission.READ_PHONE_STATE
-});
-```
-
-### 4. Volley — Requête HTTP POST asynchrone
-
-```java
-StringRequest request = new StringRequest(
-    Request.Method.POST,
-    SERVER_URL,
-    response -> { /* Succès — sur le thread UI */ },
-    error   -> { /* Erreur réseau */ }
-) {
-    @Override
-    protected Map<String, String> getParams() {
-        // Paramètres du corps POST → reçus via $_POST en PHP
-        Map<String, String> params = new HashMap<>();
-        params.put("latitude",      String.valueOf(latitude));
-        params.put("longitude",     String.valueOf(longitude));
-        params.put("date_position", lastDate);
-        params.put("imei",          deviceImei);
-        return params;
-    }
-};
-
-Volley.newRequestQueue(getApplicationContext()).add(request);
-```
-
-> **Pourquoi Volley et non Retrofit ?**  
-> Volley est plus simple pour des requêtes ponctuelles avec des paramètres simples (form-encoded).  
-> Retrofit est préférable pour des APIs REST complexes avec sérialisation JSON automatique.
-
-### 5. Sécurité backend — Requêtes préparées PDO
-
-```php
-// ❌ DANGEREUX — injection SQL possible
-$sql = "INSERT INTO position VALUES ('" . $latitude . "', '" . $longitude . "')";
-
-// ✅ SÉCURISÉ — paramètres liés
-$stmt = $pdo->prepare(
-    "INSERT INTO position (latitude, longitude, date_position, imei)
-     VALUES (:lat, :lon, :date, :imei)"
-);
-$stmt->execute([
-    ':lat'  => floatval($latitude),
-    ':lon'  => floatval($longitude),
-    ':date' => $datePosition,
-    ':imei' => $imei
-]);
-```
-
-### 6. AndroidManifest — usesCleartextTraffic
-
-```xml
-<!-- Autorise les connexions HTTP non chiffrées (serveur local XAMPP) -->
-<!-- En production : utiliser HTTPS et retirer cette option -->
-<application android:usesCleartextTraffic="true">
-```
+### usesCleartextTraffic
+Le Manifest déclare `android:usesCleartextTraffic="true"` pour autoriser les connexions HTTP non chiffrées vers le serveur XAMPP local. En environnement de production, cette option doit être retirée au profit de HTTPS.
 
 ---
 
@@ -397,49 +290,33 @@ $stmt->execute([
 |---|---|
 | 1 | Quel est le rôle du `LocationManager` dans Android ? |
 | 2 | Quelle différence entre `GPS_PROVIDER` et `NETWORK_PROVIDER` ? |
-| 3 | Pourquoi faut-il demander `ACCESS_FINE_LOCATION` à l'exécution (API 23+) ? |
+| 3 | Pourquoi faut-il demander `ACCESS_FINE_LOCATION` à l'exécution ? |
 | 4 | Quel est le rôle de `minTime` et `minDistance` dans `requestLocationUpdates()` ? |
 | 5 | Pourquoi utiliser Volley plutôt qu'un `HttpURLConnection` direct ? |
 | 6 | Quel est le rôle de `usesCleartextTraffic` dans le Manifest ? |
 | 7 | Pourquoi stocker `latitude` et `longitude` en `DOUBLE` et non `FLOAT` ? |
 | 8 | Quel est l'intérêt des requêtes préparées PDO côté PHP ? |
-| 9 | Pourquoi l'IMEI est `unknown` sur un émulateur Android ? |
-| 10 | Comment fonctionne `onLocationChanged()` ? Est-il appelé sur le thread principal ? |
+| 9 | Pourquoi l'IMEI est-il `unknown` sur un émulateur Android ? |
+| 10 | Comment fonctionne `onLocationChanged()` ? Sur quel thread est-il appelé ? |
 
 ---
 
 ## Extensions possibles
 
-- [ ] Affichage sur carte (Google Maps API ou OpenStreetMap)
-- [ ] Historique des positions dans l'app (liste scrollable)
-- [ ] Envoi d'alerte si sortie d'une zone géographique (geofencing)
-- [ ] Mode suivi continu avec notification de fond (Foreground Service)
-- [ ] Authentification du terminal (token JWT)
-- [ ] Stockage local en cache avec Room Database
+- [ ] Affichage sur carte (Google Maps API ou OpenStreetMap / Leaflet)
+- [ ] Historique des positions dans l'app
+- [ ] Mode suivi continu (Foreground Service + notification)
+- [ ] Geofencing — alerte si sortie d'une zone
 - [ ] Export CSV des positions
-- [ ] Tableau de bord admin web (PHP + JavaScript + Leaflet.js)
-
----
-
-## Démonstration
-
-### 🎥 Vidéo de démonstration
-
-> La vidéo montre le fonctionnement complet de l'application :
-> détection GPS, affichage des coordonnées, envoi au serveur et confirmation en base de données.
-
-https://github.com/user-attachments/assets/demo_video
-
-### 📸 Capture d'écran
-
-![GeoTracker Screenshot](docs/media/demo_screenshot.png)
+- [ ] Authentification du terminal (token JWT)
+- [ ] Tableau de bord web admin (PHP + Leaflet.js)
 
 ---
 
 ## 👤 Auteur
 
-**Bouanani Noussair**  
-*Cours de Programmation Mobile — Android avec Java*  
+**Bouanani Noussair**
+*Cours de Programmation Mobile — Android avec Java*
 *TP 11 — Localisation d'un Smartphone avec GPS et envoi vers un serveur distant*
 
 ---
