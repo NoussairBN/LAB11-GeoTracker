@@ -256,9 +256,11 @@ La ligne a bien été insérée en base de données avec `imei = unknown` (compo
 
 ### Vidéo de démonstration
 
-<video src="docs/media/demo_video.mp4" controls width="100%">
-  Votre navigateur ne supporte pas la lecture vidéo.
-</video>
+
+
+https://github.com/user-attachments/assets/c0d059f2-149a-4184-bb79-c6f7f03fdb2b
+
+
 
 ---
 
